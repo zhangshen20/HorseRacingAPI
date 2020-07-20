@@ -1,0 +1,64 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  HorseRacingAPI
+
+  Sample SAM Template for HorseRacingAPI
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 10
+
+Resources:
+  HorseRacingAPIFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      CodeUri: lambda/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Policies:
+        - AWSLambdaExecute
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+              Resource:
+                - arn:aws:s3:::zhangshen20-gamble/API/
+                - arn:aws:s3:::zhangshen20-gamble/API/*
+      Events:
+        HorseRacingAPI:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /race
+            Method: get
+        HorseRacingAPIByDate:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /race/{meetingDate}
+            Method: get
+        HorseRacingAPIByRunner:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /runner
+            Method: get                 
+        HorseRacingAPIByRunnerName:
+          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+          Properties:
+            Path: /runner/{runnerName}
+            Method: get            
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  HorseRacingAPIApi:
+    Description: "API Gateway endpoint URL for Prod stage for HorseRacingAPI function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/race/"
+  HorseRacingAPIFunction:
+    Description: "HorseRacingAPI Lambda Function ARN"
+    Value: !GetAtt HorseRacingAPIFunction.Arn
+  HorseRacingAPIFunctionIamRole:
+    Description: "Implicit IAM Role created for HorseRacingAPI function"
+    Value: !GetAtt HorseRacingAPIFunctionRole.Arn
